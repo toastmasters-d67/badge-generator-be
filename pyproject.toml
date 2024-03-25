@@ -2,13 +2,18 @@
 name = "badge-generator-be"
 version = "0.1.0"
 description = ""
-authors = ["Kevin <kevin.cj.lin@toastmasters.org.tw>"]
+authors = [
+    "Kevin <kevin.cj.lin@toastmasters.org.tw>",
+    "Sherry Lee <Sherry.Lee@toastmasters.org>"
+]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 fastapi = "^0.110.0"
 uvicorn = {extras = ["standard"], version = "^0.28.0"}
+pillow = "^10.2.0"
+python-multipart = "^0.0.9"
 
 
 [build-system]
