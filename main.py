@@ -5,10 +5,10 @@ import time
 import zipfile
 from typing import Union
 
-from badge_generator_be.add_text_to_pic import generate_images
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 
+from badge_generator_be.add_text_to_pic import generate_images
 
 app = FastAPI()
 
@@ -44,15 +44,15 @@ async def upload_file(file: UploadFile = File(...)):
             if not row:  # Skip empty rows
                 continue
             try:
-                division, name, club, ticket_type, name_en, club_en, remark = row
-                generate_images(division, name, club, ticket_type, name_en, club_en, remark, OUTPUT_DIR)
+                food_type, ticket_type, division, name_1, name_2, club = [value.strip() for value in row]
+                generate_images(food_type, ticket_type, division, name_1, club, name_2=name_2, output_folder=OUTPUT_DIR)
             except ValueError as e:
                 print(f"Error processing row {row}: {e}")
                 continue
         # For checking the upload file content, save the file temporarily
         # os.remove(temp_file_path)
 
-    return {"detail": "Badges generated successfully"}
+        return {"detail": "Badges generated successfully"}
 
 
 @app.get("/download/")
