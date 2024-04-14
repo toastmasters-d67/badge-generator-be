@@ -14,7 +14,6 @@ logging.basicConfig(
 
 def generate_images(food_type, ticket_type, division, name_1, club, name_2=None, output_folder=None):
     output_folder_path = Path(output_folder) if output_folder else Path(__file__).parent / "generated_images"
-    # output_folder_path = Path(output_folder) if output_folder else Path(__file__).parent
     add_text_to_image(
         food_type,
         ticket_type,
@@ -35,29 +34,23 @@ def add_text_to_image(
         club,
         output_folder_path,
 ):
-    output_folder_path = Path(output_folder_path) / ticket_type.replace(" ", "_")  # Create subfolder based on ticket type
+    output_folder_path = Path(output_folder_path) / ticket_type.replace(" ", "_")
     os.makedirs(output_folder_path, exist_ok=True)
     output_image_path = output_folder_path / f"{division+name_1}.png"
 
+    common_paths = {
+        'only_dinner': 'only_dinner.png',
+        '1st_day_with_dinner': '1st_day_with_dinner.png',
+        '2nd_day_with_dinner': '2nd_day_with_dinner.png',
+        'two_days_with_dinner': 'two_days_with_dinner.png',
+        '1st_day_without_dinner': '1st_day_without_dinner.png',
+        '2nd_day_without_dinner': '2nd_day_without_dinner.png',
+        'two_days_without_dinner': 'two_days_without_dinner.png',
+    }
+
     ticket_option_mapping = {
-        'veggie': {
-            'only_dinner': 'badge_veggie/only_dinner.png',
-            '1st_day_with_dinner': 'badge_veggie/1st_day_with_dinner.png',
-            '2nd_day_with_dinner': 'badge_veggie/2nd_day_with_dinner.png',
-            'two_days_with_dinner': 'badge_veggie/two_days_with_dinner.png',
-            '1st_day_without_dinner': 'badge_veggie/1st_day_without_dinner.png',
-            '2nd_day_without_dinner': 'badge_veggie/2nd_day_without_dinner.png',
-            'two_days_without_dinner': 'badge_veggie/two_days_without_dinner.png',
-        },
-        'non-veggie': {
-            'only_dinner': 'badge_non_veggie/only_dinner.png',
-            '1st_day_with_dinner': 'badge_non_veggie/1st_day_with_dinner.png',
-            '2nd_day_with_dinner': 'badge_non_veggie/2nd_day_with_dinner.png',
-            'two_days_with_dinner': 'badge_non_veggie/two_days_with_dinner.png',
-            '1st_day_without_dinner': 'badge_non_veggie/1st_day_without_dinner.jpg',
-            '2nd_day_without_dinner': 'badge_non_veggie/2nd_day_without_dinner.png',
-            'two_days_without_dinner': 'badge_non_veggie/two_days_without_dinner.png',
-        },
+        'veggie': {key: f'source_image/badge_veggie/{value}' for key, value in common_paths.items()},
+        'non-veggie': {key: f'source_image/badge_non_veggie/{value}' for key, value in common_paths.items()},
     }
     food_type = food_type.strip()
     ticket_type = ticket_type.strip()
@@ -80,12 +73,12 @@ def add_text_to_image(
         draw = ImageDraw.Draw(image)
         font_path = "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"
         division_font = ImageFont.truetype(font_path, 85)
-        name_font = ImageFont.truetype(font_path, 100)
-        club_font = ImageFont.truetype(font_path, 60)
+        name_font = ImageFont.truetype(font_path, 110)
+        club_font = ImageFont.truetype(font_path, 75)
 
         text_positions = [
             (520, str(division), division_font),
-            (700, str(name_1), name_font),
+            (720, str(name_1), name_font),
             (850, str(name_2) if name_2 else '', name_font),  # If name_2 is None, use empty string
             (1050, str(club), club_font),
         ]
