@@ -5,15 +5,21 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 logging.basicConfig(
-    filename='skipped_name.log',
-    format='%(asctime)s: %(levelname)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S %z',
+    filename="skipped_name.log",
+    format="%(asctime)s: %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S %z",
     level=logging.INFO,
 )
 
 
-def generate_images(food_type, ticket_type, division, name_1, club, name_2=None, output_folder=None):
-    output_folder_path = Path(output_folder) if output_folder else Path(__file__).parent / "generated_images"
+def generate_images(
+    food_type, ticket_type, division, name_1, club, name_2=None, output_folder=None
+):
+    output_folder_path = (
+        Path(output_folder)
+        if output_folder
+        else Path(__file__).parent / "generated_images"
+    )
     add_text_to_image(
         food_type,
         ticket_type,
@@ -26,31 +32,37 @@ def generate_images(food_type, ticket_type, division, name_1, club, name_2=None,
 
 
 def add_text_to_image(
-        food_type,
-        ticket_type,
-        division,
-        name_1,
-        name_2,
-        club,
-        output_folder_path,
+    food_type,
+    ticket_type,
+    division,
+    name_1,
+    name_2,
+    club,
+    output_folder_path,
 ):
     output_folder_path = Path(output_folder_path) / ticket_type.replace(" ", "_")
     os.makedirs(output_folder_path, exist_ok=True)
     output_image_path = output_folder_path / f"{division+name_1}.png"
 
     common_paths = {
-        'only_dinner': 'only_dinner.png',
-        '1st_day_with_dinner': '1st_day_with_dinner.png',
-        '2nd_day_with_dinner': '2nd_day_with_dinner.png',
-        'two_days_with_dinner': 'two_days_with_dinner.png',
-        '1st_day_without_dinner': '1st_day_without_dinner.png',
-        '2nd_day_without_dinner': '2nd_day_without_dinner.png',
-        'two_days_without_dinner': 'two_days_without_dinner.png',
+        "only_dinner": "only_dinner.png",
+        "1st_day_with_dinner": "1st_day_with_dinner.png",
+        "2nd_day_with_dinner": "2nd_day_with_dinner.png",
+        "two_days_with_dinner": "two_days_with_dinner.png",
+        "1st_day_without_dinner": "1st_day_without_dinner.png",
+        "2nd_day_without_dinner": "2nd_day_without_dinner.png",
+        "two_days_without_dinner": "two_days_without_dinner.png",
     }
 
     ticket_option_mapping = {
-        'veggie': {key: f'source_image/badge_veggie/{value}' for key, value in common_paths.items()},
-        'non-veggie': {key: f'source_image/badge_non_veggie/{value}' for key, value in common_paths.items()},
+        "veggie": {
+            key: f"source_image/badge_veggie/{value}"
+            for key, value in common_paths.items()
+        },
+        "non-veggie": {
+            key: f"source_image/badge_non_veggie/{value}"
+            for key, value in common_paths.items()
+        },
     }
     food_type = food_type.strip()
     ticket_type = ticket_type.strip()
@@ -79,11 +91,19 @@ def add_text_to_image(
         text_positions = [
             (520, str(division), division_font),
             (720, str(name_1), name_font),
-            (850, str(name_2) if name_2 else '', name_font),  # If name_2 is None, use empty string
+            (
+                850,
+                str(name_2) if name_2 else "",
+                name_font,
+            ),  # If name_2 is None, use empty string
             (1050, str(club), club_font),
         ]
 
-        for y, text, font, in text_positions:
+        for (
+            y,
+            text,
+            font,
+        ) in text_positions:
             x = (image.width - 1) / 2
             draw.text((x, y - 1 / 2), text, font=font, fill=(0, 0, 0), anchor="mm")
 
