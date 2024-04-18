@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "badge-generator-be"
-version = "0.1.0"
-description = ""
+version = "0.2.0"
+description = "Badge Generator for Annual Conference"
 authors = [
-    "Kevin <kevin.cj.lin@toastmasters.org.tw>",
-    "Sherry Lee <Sherry.Lee@toastmasters.org>"
+    "Kevin Lin <kevin.cj.lin@toastmasters.org.tw>",
+    "Sherry Lee <Sherry.Lee@toastmasters.org.tw>"
 ]
 readme = "README.md"
 
@@ -15,7 +15,15 @@ uvicorn = {extras = ["standard"], version = "^0.28.0"}
 pillow = "^10.3.0"
 python-multipart = "^0.0.9"
 reportlab = "^4.1.0"
+poetry = "^1.8.2"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.7"
+
+[tool.poe.tasks]
+format = "ruff format"
+lint = "ruff check"
+run = "uvicorn main:app --reload"
 
 [build-system]
 requires = ["poetry-core"]

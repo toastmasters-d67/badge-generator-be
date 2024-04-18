@@ -32,15 +32,25 @@ def clear_output_directory():
 
 
 def combine_images_to_pdf():
-    files_and_folders = [f for f in os.listdir(OUTPUT_DIR) if os.path.join(OUTPUT_DIR, f)]
+    files_and_folders = [
+        f for f in os.listdir(OUTPUT_DIR) if os.path.join(OUTPUT_DIR, f)
+    ]
     folders = [f for f in files_and_folders if isdir(join(OUTPUT_DIR, f))]
 
     image_files = []
 
     for folder in folders:
         folder_path = join(OUTPUT_DIR, folder)
-        files_in_folder = [f for f in os.listdir(folder_path) if isfile(join(folder_path, f))]
-        image_files.extend([join(folder_path, f) for f in files_in_folder if f.lower().endswith(('.png'))])
+        files_in_folder = [
+            f for f in os.listdir(folder_path) if isfile(join(folder_path, f))
+        ]
+        image_files.extend(
+            [
+                join(folder_path, f)
+                for f in files_in_folder
+                if f.lower().endswith((".png"))
+            ]
+        )
     if not image_files:
         return
 
@@ -53,7 +63,9 @@ async def combine_images_to_pdf_endpoint():
         if not os.path.exists(OUTPUT_DIR):
             raise FileNotFoundError("Generated images folder not found")
 
-        return FileResponse(output_pdf, media_type="application/pdf", filename="badges.pdf")
+        return FileResponse(
+            output_pdf, media_type="application/pdf", filename="badges.pdf"
+        )
 
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -78,8 +90,18 @@ async def upload_csv_file(file: UploadFile = File(...)):
             if not row:
                 continue
             try:
-                food_type, ticket_type, division, name_1, name_2, club = [value.strip() for value in row]
-                generate_images(food_type, ticket_type, division, name_1, club, name_2, output_folder=OUTPUT_DIR)
+                food_type, ticket_type, division, name_1, name_2, club = [
+                    value.strip() for value in row
+                ]
+                generate_images(
+                    food_type,
+                    ticket_type,
+                    division,
+                    name_1,
+                    club,
+                    name_2,
+                    output_folder=OUTPUT_DIR,
+                )
             except ValueError as e:
                 print(f"Error processing row {row}: {e}")
                 continue
@@ -109,7 +131,9 @@ async def upload_csv_file(file: UploadFile = File(...)):
 @app.get("/download_zip/{zip_file_name}")
 async def download_zip(zip_file_name: str):
     zip_file_path = f"./{zip_file_name}"
-    return FileResponse(zip_file_path, media_type="application/zip", filename=zip_file_name)
+    return FileResponse(
+        zip_file_path, media_type="application/zip", filename=zip_file_name
+    )
 
 
 if __name__ == "__main__":
