@@ -166,6 +166,8 @@ generated_images*
 #test_files
 registration_list*.csv
 
+upload_files/
+
 #others
 .DS_Store
 .xlsx
