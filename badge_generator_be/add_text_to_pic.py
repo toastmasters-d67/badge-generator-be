@@ -1,110 +1,64 @@
 import logging
-import os
 from pathlib import Path
-
 from PIL import Image, ImageDraw, ImageFont
 
 logging.basicConfig(
-    filename="skipped_name.log",
-    format="%(asctime)s: %(levelname)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S %z",
-    level=logging.INFO,
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
 
 def generate_images(
     food_type, ticket_type, division, name_1, club, name_2=None, output_folder=None
 ):
-    output_folder_path = (
+    output_folder = (
         Path(output_folder)
         if output_folder
         else Path(__file__).parent / "generated_images"
     )
-    add_text_to_image(
-        food_type,
-        ticket_type,
-        division,
-        name_1,
-        name_2,
-        club,
-        output_folder_path,
-    )
+    output_folder.mkdir(parents=True, exist_ok=True)
+
+    ticket_type_clean = ticket_type.replace(" ", "_")
+    output_image_path = output_folder / f"{division}_{name_1}.png"
+
+    image_template_path = find_image_template_path(food_type, ticket_type)
+    if image_template_path:
+        add_text_to_image(
+            image_template_path, output_image_path, division, name_1, name_2, club
+        )
 
 
-def add_text_to_image(
-    food_type,
-    ticket_type,
-    division,
-    name_1,
-    name_2,
-    club,
-    output_folder_path,
-):
-    output_folder_path = Path(output_folder_path) / ticket_type.replace(" ", "_")
-    os.makedirs(output_folder_path, exist_ok=True)
-    output_image_path = output_folder_path / f"{division+name_1}.png"
-
-    common_paths = {
-        "only_dinner": "only_dinner.png",
-        "1st_day_with_dinner": "1st_day_with_dinner.png",
-        "2nd_day_with_dinner": "2nd_day_with_dinner.png",
-        "two_days_with_dinner": "two_days_with_dinner.png",
-        "1st_day_without_dinner": "1st_day_without_dinner.png",
-        "2nd_day_without_dinner": "2nd_day_without_dinner.png",
-        "two_days_without_dinner": "two_days_without_dinner.png",
+def find_image_template_path(food_type, ticket_type):
+    ticket_options = {
+        "veggie": "source_image/badge_veggie",
+        "non-veggie": "source_image/badge_non_veggie",
     }
+    template_path = Path(ticket_options.get(food_type, "")) / f"{ticket_type}.png"
+    if not template_path.exists():
+        logging.error(
+            f"Template not found for food type {food_type} and ticket type {ticket_type}"
+        )
+        return None
+    return template_path
 
-    ticket_option_mapping = {
-        "veggie": {
-            key: f"source_image/badge_veggie/{value}"
-            for key, value in common_paths.items()
-        },
-        "non-veggie": {
-            key: f"source_image/badge_non_veggie/{value}"
-            for key, value in common_paths.items()
-        },
-    }
-    food_type = food_type.strip()
-    ticket_type = ticket_type.strip()
 
-    if food_type not in ticket_option_mapping:
-        logging.error(f"Invalid food type: {food_type}")
-        return
+def add_text_to_image(template_path, output_path, division, name_1, name_2, club):
+    with Image.open(template_path) as img:
+        draw = ImageDraw.Draw(img)
+        font_path = "/path/to/your/fonts/Arial.ttf"  # Update this path
+        font_sizes = {"division": 85, "name": 110, "club": 75}
+        fonts = {
+            key: ImageFont.truetype(font_path, size) for key, size in font_sizes.items()
+        }
 
-    food_mapping = ticket_option_mapping[food_type]
+        text_positions = {
+            "division": (img.width / 2, 520, fonts["division"]),
+            "name_1": (img.width / 2, 720, fonts["name"]),
+            "name_2": (img.width / 2, 850, fonts["name"]) if name_2 else None,
+            "club": (img.width / 2, 1050, fonts["club"]),
+        }
 
-    if ticket_type not in food_mapping:
-        logging.error(f"Invalid ticket type for user {name_1}: {ticket_type}")
-        return
+        for key, (x, y, font) in text_positions.items():
+            if text := getattr(locals(), key):
+                draw.text((x, y), text, font=font, fill=(0, 0, 0), anchor="mm")
 
-    image_path = food_mapping[ticket_type]
-
-    with Image.open(image_path) as image:
-        image = image.convert("RGB")
-
-        draw = ImageDraw.Draw(image)
-        font_path = "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"
-        division_font = ImageFont.truetype(font_path, 85)
-        name_font = ImageFont.truetype(font_path, 110)
-        club_font = ImageFont.truetype(font_path, 75)
-
-        text_positions = [
-            (520, str(division), division_font),
-            (720, str(name_1), name_font),
-            (
-                850,
-                str(name_2) if name_2 else "",
-                name_font,
-            ),  # If name_2 is None, use empty string
-            (1050, str(club), club_font),
-        ]
-
-        for (
-            y,
-            text,
-            font,
-        ) in text_positions:
-            x = (image.width - 1) / 2
-            draw.text((x, y - 1 / 2), text, font=font, fill=(0, 0, 0), anchor="mm")
-
-        image.save(output_image_path)
+        img.save(output_path)
