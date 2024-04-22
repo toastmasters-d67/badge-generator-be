@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile, Depends, HTTPException
 from fastapi.responses import FileResponse
 from dependencies import save_upload_file, clean_directory
@@ -8,7 +9,16 @@ import csv
 from badge_generator_be.add_text_to_pic import generate_images
 from badge_generator_be.merge_pic_to_file import generate_pdf
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
+    Path(settings.output_dir).mkdir(parents=True, exist_ok=True)
+    yield
+    clean_directory(Path(settings.upload_dir))
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/upload_csv")
@@ -66,9 +76,3 @@ async def download_zip():
     return FileResponse(
         zip_file_path, media_type="application/zip", filename="generated_images.zip"
     )
-
-
-@app.on_startup
-def startup_event():
-    Path(settings.upload_dir).mkdir(parents=True, exist_ok=True)
-    Path(settings.output_dir).mkdir(parents=True, exist_ok=True)
