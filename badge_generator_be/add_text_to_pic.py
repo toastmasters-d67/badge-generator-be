@@ -44,7 +44,7 @@ def find_image_template_path(food_type, ticket_type):
 def add_text_to_image(template_path, output_path, division, name_1, name_2, club):
     with Image.open(template_path) as img:
         draw = ImageDraw.Draw(img)
-        font_path = "/path/to/your/fonts/Arial.ttf"  # Update this path
+        font_path = Path(__file__).parent.parent / "fonts" / "NotoSansTC-Regular.ttf"
         font_sizes = {"division": 85, "name": 110, "club": 75}
         fonts = {
             key: ImageFont.truetype(font_path, size) for key, size in font_sizes.items()
