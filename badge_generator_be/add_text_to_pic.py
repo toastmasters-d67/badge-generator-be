@@ -57,8 +57,11 @@ def add_text_to_image(template_path, output_path, division, name_1, name_2, club
             "club": (img.width / 2, 1050, fonts["club"]),
         }
 
-        for key, (x, y, font) in text_positions.items():
-            if text := getattr(locals(), key):
+        for key, item in text_positions.items():
+            if not item:
+                continue
+            x, y, font = item
+            if text := locals()[key]:
                 draw.text((x, y), text, font=font, fill=(0, 0, 0), anchor="mm")
 
         img.save(output_path)
