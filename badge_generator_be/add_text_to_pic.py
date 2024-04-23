@@ -20,7 +20,7 @@ def generate_images(
     ticket_type_clean = ticket_type.replace(" ", "_")
     output_image_path = output_folder / f"{division}_{name_1}.png"
 
-    image_template_path = find_image_template_path(food_type, ticket_type)
+    image_template_path = find_image_template_path(food_type, ticket_type_clean)
     if image_template_path:
         add_text_to_image(
             image_template_path, output_image_path, division, name_1, name_2, club
