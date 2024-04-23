@@ -23,7 +23,7 @@ ruff = "^0.3.7"
 
 [tool.poe.tasks]
 format = "ruff format"
-lint = "ruff check"
+lint = "ruff check --fix"
 run = "uvicorn main:app --reload"
 
 [build-system]
