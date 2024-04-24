@@ -5,9 +5,17 @@ from dependencies import save_upload_file, clean_directory
 from config import settings
 from pathlib import Path
 import csv
+import logging
 
 from badge_generator_be.add_text_to_pic import generate_images
 from badge_generator_be.merge_pic_to_file import generate_pdf
+
+logging.basicConfig(
+    filename="skipped_row.log",
+    format="%(asctime)s: %(levelname)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S %z",
+    level=logging.INFO,
+)
 
 
 @asynccontextmanager
@@ -35,6 +43,7 @@ async def process_csv_file(csv_file: Path):
         next(reader)  # Skip header
         for row in reader:
             if not row:
+                logging.warning(f"Empty row at line {row} in {csv_file}")  # 寫入 logger 檔案
                 continue
             food_type, ticket_type, division, name_1, name_2, club = [
                 value.strip() for value in row
