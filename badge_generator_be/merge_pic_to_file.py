@@ -1,5 +1,8 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def generate_pdf(image_paths, output_pdf):
@@ -8,7 +11,6 @@ def generate_pdf(image_paths, output_pdf):
 
     # Calculate the number of pages needed
     num_pages = len(image_paths) // 4 + (1 if len(image_paths) % 4 != 0 else 0)
-    print("num_pages:", num_pages)
 
     for i in range(num_pages):
         if i != 0:
@@ -25,6 +27,10 @@ def generate_pdf(image_paths, output_pdf):
                         image_path, x_offset, y_offset, width / 2 - 40, height / 2 - 40
                     )
                 except Exception as e:
-                    print(f"Error adding image {image_path}: {e}")
+                    logger.error(f"Error adding image {image_path}: {e}")
 
-    c.save()
+    try:
+        c.save()
+        logger.info(f"PDF saved: {output_pdf}")
+    except Exception as e:
+        logger.error(f"Failed to save PDF: {e}")
